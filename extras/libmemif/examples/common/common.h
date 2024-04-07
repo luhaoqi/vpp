@@ -104,12 +104,19 @@ int send_packets (memif_connection_t *conn, uint16_t qid,
 		  packet_generator_t *gen, uint32_t num_pkts,
 		  uint16_t max_pkt_size);
 
+int send_packets2 (memif_connection_t *conn, uint16_t qid,
+		  packet_generator_t *gen, uint32_t num_pkts,
+		  uint16_t max_pkt_size, int flag);
+
 /* Expect packets smaller than 2048b */
 int responder (memif_conn_handle_t conn, void *private_ctx, uint16_t qid);
 
 /* Expect packets smaller than 2048b */
 int responder_zero_copy (memif_conn_handle_t conn, void *private_ctx,
 			 uint16_t qid);
+
+/* Expect packets smaller than 2048b */
+int responder_bandwidth (memif_conn_handle_t conn, void *private_ctx, uint16_t qid);
 
 /* reply with the same data */
 int basic_packet_handler (memif_connection_t *conn);

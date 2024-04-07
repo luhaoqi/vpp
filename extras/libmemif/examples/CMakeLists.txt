@@ -36,3 +36,20 @@ foreach (EXAMPLE_SRC ${EXAMPLES_LIST})
   target_include_directories(${EXECUTABLE} PRIVATE $<BUILD_INTERFACE:${COMMON_HEADERS}>)
   target_link_libraries(${EXECUTABLE} memif ${CMAKE_THREAD_LIBS_INIT})
 endforeach()
+
+list(APPEND BW_LIST
+  bwtest/master.c
+  bwtest/worker.c
+)
+
+foreach (BW_SRC ${BW_LIST})
+  string(FIND ${BW_SRC} "." END_INDEX)
+  string(FIND ${BW_SRC} "/" INDEX)
+  math(EXPR INDEX "${INDEX} + 1")
+  math(EXPR LEN "${END_INDEX} - ${INDEX}")
+  string(SUBSTRING ${BW_SRC} ${INDEX} ${LEN} EXECUTABLE)
+  add_executable(${EXECUTABLE} ${COMMON_SOURCE_FILES} ${BW_SRC} )
+  target_include_directories(${EXECUTABLE} PRIVATE $<BUILD_INTERFACE:${COMMON_HEADERS}>)
+  target_link_libraries(${EXECUTABLE} memif ${CMAKE_THREAD_LIBS_INIT})
+  target_compile_options(${EXECUTABLE} PRIVATE -g)
+endforeach()
