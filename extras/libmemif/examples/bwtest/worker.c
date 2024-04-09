@@ -187,8 +187,9 @@ main (int argc, char *argv[])
   memif_socket_handle_t memif_socket;
   int opt, err, ret = 0;
   is_reverse = 0;
+  char socket_path[1024];
 
-  while ((opt = getopt (argc, argv, "r?v")) != -1)
+  while ((opt = getopt (argc, argv, "r?vn:")) != -1)
     {
       switch (opt)
 	{
@@ -201,6 +202,9 @@ main (int argc, char *argv[])
 	case 'v':
 	  print_version ();
 	  return 0;
+  case 'n':
+    strcpy(socket_path, optarg);
+    break;
 	}
     }
 
@@ -210,9 +214,9 @@ main (int argc, char *argv[])
    */
   /* Abstract socket supported */
   memif_socket_args.path[0] = '@';
-  strncpy (memif_socket_args.path + 1, APP_NAME, strlen (APP_NAME));
+  strncpy (memif_socket_args.path + 1, socket_path, strlen (socket_path));
   /* Set application name */
-  strncpy (memif_socket_args.app_name, APP_NAME, strlen (APP_NAME));
+  strncpy (memif_socket_args.app_name, socket_path, strlen (socket_path));
 
   err = memif_create_socket (&memif_socket, &memif_socket_args, NULL);
   if (err != MEMIF_ERR_SUCCESS)
