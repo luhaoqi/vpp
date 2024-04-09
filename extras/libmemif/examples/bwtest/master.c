@@ -166,7 +166,23 @@ verify_packet (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
     send_packets2 (&intf0, 0, packet_generator, 1, 1 * 1024, -cnt);
   }
   else if (((int *)c->rx_bufs[0].data)[0] == cnt){
-    // assert(((int *)c->rx_bufs[0].data)[cnt % (1024 / 4)] == cnt);
+    assert(c->rx_buf_num == 1024);
+    assert(((int *)c->rx_bufs[0].data)[cnt % (1024 / 4)] == cnt);
+
+    // memif_buffer_t *mb;
+    // int flag = 0;
+    // for (int i = 0; i < c->rx_buf_num; i++)
+    // {
+    //   // memcpy (c->tx_bufs[i].data, c->rx_bufs[i].data, c->rx_bufs[i].len);
+    //   	mb = &c->tx_bufs[i];
+    //     int *a = (int *)mb->data;
+    //     for (int j = 0; j < mb->len / sizeof(int); j++)
+	  //       if (a[j] != cnt) flag = 1;
+    //     // a[0] = flag;
+    //     // a[flag % (need_size / 4)] = flag;
+    // }
+    // assert(flag == 0);
+
     cnt ++;
     send_packets2 (&intf0, 0, packet_generator, 1, 1 * 1024, -cnt);
 
@@ -176,7 +192,7 @@ verify_packet (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
   }
 
   // INFO("cnt:%d", cnt);
-  if (cnt % 1000 == 0) {
+  if (cnt % 20000 == 0) {
     
     gettimeofday(&end, NULL); // 记录结束时间
     double seconds = (end.tv_sec - start.tv_sec) + 

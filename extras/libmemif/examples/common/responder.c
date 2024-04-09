@@ -172,6 +172,53 @@ error:
   return -1;
 }
 
+void process_data_memset( memif_connection_t *c, int flag, int need_size){
+    memif_buffer_t *mb;
+    for (int i = 0; i < c->tx_buf_num; i++)
+    {
+      // memcpy (c->tx_bufs[i].data, c->rx_bufs[i].data, c->rx_bufs[i].len);
+      	mb = &c->tx_bufs[i];
+        assert(mb->len == c->buffer_size);
+        int *a = (int *)mb->data;
+        // for (int j = 0; j < mb->len / sizeof(int); j++)
+	      //   a[j] = flag;
+        memset(a, 0, mb->len);
+        a[0] = flag;
+        a[flag % (need_size / 4)] = flag;
+    }
+}
+int B[1024] = {1,2,3,4,5};
+
+void process_data( memif_connection_t *c, int flag, int need_size){
+    memif_buffer_t *mb;
+    for (int i = 0; i < c->tx_buf_num; i++)
+    {
+      // memcpy (c->tx_bufs[i].data, c->rx_bufs[i].data, c->rx_bufs[i].len);
+      	mb = &c->tx_bufs[i];
+        assert(mb->len == c->buffer_size);
+        int *a = (int *)mb->data;
+        // for (int j = 0; j < mb->len / sizeof(int); j++)
+	      //   a[j] = flag;
+        // memset(a, 0, mb->len);
+        memcpy(a, B, need_size);
+        a[0] = flag;
+        a[flag % (need_size / 4)] = flag;
+    }
+}
+
+void process_data_all( memif_connection_t *c, int flag, int need_size){
+    memif_buffer_t *mb;
+    for (int i = 0; i < c->tx_buf_num; i++)
+    {
+      // memcpy (c->tx_bufs[i].data, c->rx_bufs[i].data, c->rx_bufs[i].len);
+      	mb = &c->tx_bufs[i];
+        assert(mb->len == c->buffer_size);
+        int *a = (int *)mb->data;
+        for (int j = 0; j < mb->len / sizeof(int); j++)
+	        a[j] = flag;
+    }
+}
+
 int
 responder_bandwidth (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
 {
@@ -198,6 +245,8 @@ responder_bandwidth (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
 
   do
     {
+      if (c->tx_buf_num != need_send){
+        INFO("in alloc [respond] c->tx_buf_num:%d", c->tx_buf_num);
       /* allocate tx buffers */
       err = memif_buffer_alloc (conn, qid, c->tx_bufs, 
         // c->rx_buf_num,
@@ -210,6 +259,8 @@ responder_bandwidth (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
 	  INFO ("memif_buffer_alloc: %s", memif_strerror (err));
 	  goto error;
 	}
+  assert(c->tx_buf_num == need_send);
+      }
 
   // INFO("worker respond alloc buf_num:%d c->buffer_size:%d", c->tx_buf_num, c->buffer_size);
 
@@ -225,18 +276,10 @@ responder_bandwidth (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
 	//   INFO ("packet handler error: %d", err);
 	//   goto error;
 	// }
-    memif_buffer_t *mb;
-    for (i = 0; i < c->tx_buf_num; i++)
-    {
-      // memcpy (c->tx_bufs[i].data, c->rx_bufs[i].data, c->rx_bufs[i].len);
-      	mb = &c->tx_bufs[i];
-        assert(mb->len == c->buffer_size);
-        int *a = (int *)mb->data;
-        // for (int j = 0; j < mb->len / sizeof(int); j++)
-	      //   a[j] = flag;
-        a[0] = flag;
-        a[flag % (need_size / 4)] = flag;
-    }
+
+    // process_data_memset(c, flag, need_size);
+    // process_data_all(c, flag, need_size);
+    process_data(c, flag, need_size);
 
 
 
@@ -271,6 +314,7 @@ responder_bandwidth (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
   // while (c->rx_buf_num > 0);
   while (c->tx_buf_num > 0);
   c->rx_buf_num = 0;
+  c->tx_buf_num = need_send;
 
   return 0;
 

@@ -59,11 +59,14 @@ send_packets2 (memif_connection_t *c, uint16_t qid,
 	       packet_generator_t *generator, uint32_t num_pkts,
 	       uint16_t max_pkt_size, int flag)
 {
+  int tmp = num_pkts;
   int err, i;
   uint16_t tx;
   // INFO("sned_packets %d %d", num_pkts, max_pkt_size);
   do
     {
+      if (c->tx_buf_num != num_pkts){
+        // INFO("in alloc [send] c->tx_buf_num:%d", c->tx_buf_num);
       err = memif_buffer_alloc (c->conn, qid, c->tx_bufs,
 				num_pkts > MAX_MEMIF_BUFS ? MAX_MEMIF_BUFS :
 							    num_pkts,
@@ -74,6 +77,8 @@ send_packets2 (memif_connection_t *c, uint16_t qid,
 	  INFO ("memif_buffer_alloc: %s", memif_strerror (err));
 	  goto error;
 	}
+      }
+    assert(c->tx_buf_num == num_pkts);
       // INFO("sender num_pkts=%d tx_buf_num=%d len0=%d",num_pkts,
       // c->tx_buf_num, c->tx_bufs[0].len);
 
@@ -130,6 +135,8 @@ send_packets2 (memif_connection_t *c, uint16_t qid,
       num_pkts -= tx;
     }
   while (num_pkts > 0);
+
+  // c->tx_buf_num = tmp;
 
   return 0;
 
