@@ -126,7 +126,7 @@ on_disconnect (memif_conn_handle_t conn, void *private_ctx)
   memif_connection_t *c = (memif_connection_t *) private_ctx;
 
   c->is_connected = 0;
-  free_memif_buffers (c);
+  cnt = 0;
 
 //   for (int i=1;i<=8;i++){
 //     sleep(1);
@@ -134,9 +134,10 @@ on_disconnect (memif_conn_handle_t conn, void *private_ctx)
 //   }
 
   /* stop event polling thread */
-  int err = memif_cancel_poll_event (memif_get_socket_handle (conn));
-  if (err != MEMIF_ERR_SUCCESS)
-    INFO ("We are doomed...");
+  // free_memif_buffers (c);
+  // int err = memif_cancel_poll_event (memif_get_socket_handle (conn));
+  // if (err != MEMIF_ERR_SUCCESS)
+  //   INFO ("We are doomed...");
 
   return 0;
 }
