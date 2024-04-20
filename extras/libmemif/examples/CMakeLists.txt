@@ -50,6 +50,11 @@ foreach (BW_SRC ${BW_LIST})
   string(SUBSTRING ${BW_SRC} ${INDEX} ${LEN} EXECUTABLE)
   add_executable(${EXECUTABLE} ${COMMON_SOURCE_FILES} ${BW_SRC} )
   target_include_directories(${EXECUTABLE} PRIVATE $<BUILD_INTERFACE:${COMMON_HEADERS}>)
-  target_link_libraries(${EXECUTABLE} memif ${CMAKE_THREAD_LIBS_INIT})
+
+  # target_link_libraries(${EXECUTABLE} memif ${CMAKE_THREAD_LIBS_INIT})
+  # target_link_libraries(${EXECUTABLE} PRIVATE memif_static)  # 静态链接 memif
+  # list(APPEND CMAKE_LIBRARY_PATH "${CMAKE_BINARY_DIR}/build/src")
+  target_link_libraries(${EXECUTABLE} PRIVATE memif_object)  
+
   target_compile_options(${EXECUTABLE} PRIVATE -g)
 endforeach()
