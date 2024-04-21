@@ -213,8 +213,9 @@ main (int argc, char *argv[])
    * Interfaces are internally stored in a database referenced by memif socket.
    */
   /* Abstract socket supported */
-  memif_socket_args.path[0] = '@';
-  strncpy (memif_socket_args.path + 1, socket_path, strlen (socket_path));
+  // memif_socket_args.path[0] = '@';
+  // strncpy (memif_socket_args.path + 1, socket_path, strlen (socket_path));
+  strncpy (memif_socket_args.path, socket_path, strlen (socket_path));
   /* Set application name */
   strncpy (memif_socket_args.app_name, socket_path, strlen (socket_path));
 
