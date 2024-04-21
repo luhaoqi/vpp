@@ -242,11 +242,11 @@ responder_bandwidth (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
   assert(ch[0] == 'O' && ch[1] == 'K');
   int flag = ((int *)(ch + 2))[0];
   // INFO("[responder] flag:%d", flag);
-
+  // INFO("[before] c->tx_bufs:%p", c->tx_bufs);
   do
     {
-      if (c->tx_buf_num != need_send){
-        INFO("in alloc [respond] c->tx_buf_num:%d", c->tx_buf_num);
+      if (1 || c->tx_buf_num != need_send){
+        // INFO("in alloc [respond] c->tx_buf_num:%d", c->tx_buf_num);
       /* allocate tx buffers */
       err = memif_buffer_alloc (conn, qid, c->tx_bufs, 
         // c->rx_buf_num,
@@ -261,7 +261,7 @@ responder_bandwidth (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
 	}
   assert(c->tx_buf_num == need_send);
       }
-
+  // INFO("[after] c->tx_bufs:%p", c->tx_bufs);
   // INFO("worker respond alloc buf_num:%d c->buffer_size:%d", c->tx_buf_num, c->buffer_size);
 
       /* Process the packets */
