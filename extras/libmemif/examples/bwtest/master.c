@@ -299,14 +299,63 @@ print_help ()
   printf ("\t-v\tShow libmemif and memif version information and exit.\n");
 }
 
+char socket_path[1024];
+
+#include <sys/stat.h>
+// Function to check if a path starts with '@'
+int starts_with_at(const char *path) {
+    if (path[0] == '@') {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+// Function to check if a file exists
+int file_exists(const char *path) {
+    struct stat st;
+    if (stat(path, &st) == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+// Function to delete a file
+void delete_file(const char *path) {
+    if (remove(path) == 0) {
+        printf("File '%s' deleted successfully.\n", path);
+    } else {
+        perror("Failed to delete file:");
+    }
+}
+
+#include<signal.h>
+void check_remove_file(int signal) {
+    // 检查 socket_path 是否以 '@' 开头
+    if (!starts_with_at(socket_path)) {
+        // 检查文件是否存在
+        if (file_exists(socket_path)) {
+            // 删除文件
+            delete_file(socket_path);
+        } else {
+            printf("文件 '%s' 不存在。\n", socket_path);
+        }
+    }
+
+    // 使用接收到的相同信号退出程序
+    exit(signal);
+}
+
 int
 main (int argc, char *argv[])
 {
+  signal(SIGINT, check_remove_file);
+
   memif_socket_args_t memif_socket_args = { 0 };
   memif_socket_handle_t memif_socket;
   int opt, err, ret = 0;
   is_reverse = 0;
-  char socket_path[1024];
 
   while ((opt = getopt (argc, argv, "r?vn:")) != -1)
     {
@@ -382,6 +431,10 @@ main (int argc, char *argv[])
       err = memif_poll_event (memif_socket, -1);
     }
   while (err == MEMIF_ERR_SUCCESS);
+
+  // remove socket file
+  // Check if socket_path starts with '@'
+  check_remove_file(0);
 
   return 0;
 
