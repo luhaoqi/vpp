@@ -62,7 +62,7 @@ send_packets2 (memif_connection_t *c, uint16_t qid,
   int tmp = num_pkts;
   int err, i;
   uint16_t tx;
-  // INFO("sned_packets %d %d", num_pkts, max_pkt_size);
+  // INFO("sned_packets num_pkts:%d max_pkt_size:%d c->tx_buf_num:%d", num_pkts, max_pkt_size, c->tx_buf_num);
   do
     {
       if (c->tx_buf_num != num_pkts){

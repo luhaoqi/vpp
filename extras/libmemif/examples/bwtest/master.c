@@ -155,6 +155,8 @@ verify_packet (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
       INFO ("meif_rx_burst: %s", memif_strerror (err));
       return err;
     }
+  // INFO ("c->rx_buf_num=%d", c->rx_buf_num);
+
   // refill the queue
   err = memif_refill_queue (conn, qid, c->rx_buf_num, 0);
   if (err != MEMIF_ERR_SUCCESS)
@@ -167,6 +169,9 @@ verify_packet (memif_conn_handle_t conn, void *private_ctx, uint16_t qid)
     send_packets2 (&intf0, 0, packet_generator, 1, 1 * 1024, -cnt);
   }
   else if (((int *)c->rx_bufs[0].data)[0] == cnt){
+    // if (c->rx_buf_num != 1024){
+    //   INFO ("c->rx_buf_num=%d", c->rx_buf_num);
+    // }
     assert(c->rx_buf_num == 1024);
     assert(((int *)c->rx_bufs[0].data)[cnt % (1024 / 4)] == cnt);
 
@@ -327,8 +332,9 @@ main (int argc, char *argv[])
    * Interfaces are internally stored in a database referenced by memif socket.
    */
   /* Abstract socket supported */
-  memif_socket_args.path[0] = '@';
-  strncpy (memif_socket_args.path + 1, socket_path, strlen (socket_path));
+  // memif_socket_args.path[0] = '@';
+  // strncpy (memif_socket_args.path + 1, socket_path, strlen (socket_path));
+  strncpy (memif_socket_args.path, socket_path, strlen (socket_path));
   /* Set application name */
   strncpy (memif_socket_args.app_name, socket_path, strlen (socket_path));
 
